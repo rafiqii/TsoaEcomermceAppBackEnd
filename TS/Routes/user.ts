@@ -5,12 +5,20 @@ import bcrypt from "bcrypt";
 import { isLoggedIn } from "../MiddleWare/logedInAuth";
 import { isAdmin } from "../MiddleWare/isAdminAuth";
 import { Cart } from "../Models/cart";
+import { Controller, Path, Post, Put, Query, Route, Security, Body, BodyProp } from "@tsoa/runtime";
+import { Iuser } from "../Interfaces/Iuser";
 
 const router = express.Router();
 
 //create a new user
+@Route("user")
+export class userRoute extends Controller
+{
+    // router.post('/',async (req, res) => {
+@Post()
+public async createAccount(@BodyProp() userName:string, @BodyProp() password:string){
 
-router.post('/',async (req, res) => {
+
     //input validation
     let inputLength:number=0;
     enum Length{
@@ -24,51 +32,51 @@ router.post('/',async (req, res) => {
         ShortPasswordandLongUserName=12,
     }
 
-    if(req.body.userName.length < 4 )
+    if(userName.length < 4 )
         inputLength+=Length.ShortUserName;
-    if(req.body.password.length < 6)
+    if(password.length < 6)
         inputLength+=Length.ShortPassword;
-    if(req.body.userName.length > 15 )
+    if(userName.length > 15 )
         inputLength+=Length.LongUserName;
-    if(req.body.password.length > 30)
+    if(password.length > 30)
         inputLength+=Length.LongPassword;
 
     //Checking inpute length
     switch (inputLength){
         case Length.ShortUserNameandPassword:
-            res.send(`User name and password are too short. 4 < userName < 15 , 6 < password < 30`).status(409)
-        return;
+            return(`User name and password are too short. 4 < userName < 15 , 6 < password < 30`)
+        
         case Length.ShortUserName:
-            res.send(`User name is too short. 4 < userName < 15 `).status(409)
-        return;
+            return(`User name is too short. 4 < userName < 15 `)
+        
         case Length.ShortPassword:
-            res.send(`Password is too short. 6 < password < 30`).status(409)
-        return;
+            return(`Password is too short. 6 < password < 30`)
+
         case Length.LongUserNameandPassword:
-            res.send(`User name and password are too Long. 4 < userName < 15 , 6 < password < 30`).status(409)
-        return;
+            return(`User name and password are too Long. 4 < userName < 15 , 6 < password < 30`)
+        
         case Length.LongUserName:
-            res.send(`User name is too long. 4 < userName < 15`).status(409)
-        return;
+            return(`User name is too long. 4 < userName < 15`)
+
         case Length.LongPassword:
-            res.send(`Password is too long. 6 < password < 30`).status(409)
-        return;
+            return(`Password is too long. 6 < password < 30`)
+        
         case Length.ShortPasswordandLongUserName:
-            res.send(`User name is long password is short. 4 < userName < 15 , 6 < password < 30`).status(409)
-        return;
+            return(`User name is long password is short. 4 < userName < 15 , 6 < password < 30`)
+        
         case Length.ShortUserNameandLongPasswords:
-            res.send(`User name is short and password is long. 4 < userName < 15 , 6 < password < 30`).status(409)
-        return;
+            return(`User name is short and password is long. 4 < userName < 15 , 6 < password < 30`)
+        
     }
 
-    if( await User.findOne({userName: req.body.userName}))
+    if( await User.findOne({userName: userName}))
     {
-        return res.send("UserName is taken, please choose another");
+        throw new Error("UserName is taken, please choose another");
     }
 
     const user = new User();
-    user.userName= req.body.userName;
-    user.password= await bcrypt.hash(req.body.password, await bcrypt.genSalt(10));
+    user.userName= userName;
+    user.password= await bcrypt.hash(password, await bcrypt.genSalt(10));
     user.isPremium = false;
     user.isAdmin = false;
 
@@ -79,74 +87,85 @@ router.post('/',async (req, res) => {
     await userCart.save();
     await user.save();
     // console.log(user);
-    res.send('User created');
     
-    
-});
+    await User.createIndexes({userName: 1})
+    return("User created")
+}
 
-router.put("/setAsAdmin/:_id",isLoggedIn, isAdmin,async (req,res)=>{
-    let user = await User.findOne({_id: req.params._id});
+
+@Security("isLoggedIn")
+@Put("/setAsAdmin/{_id}")
+public async setAsAdmin(@Path() _id: string){
+// router.put("/setAsAdmin/:_id",isLoggedIn, isAdmin,async (req,res)=>{
+    let user = await User.findOne({_id: _id});
     if(!user)
-        return res.status(404).send("No user found with this ID");
+        return ("No user found with this ID");
     
     if(user.isAdmin)
-        return res.status(409).send("User is already Admin")
+        return ("User is already Admin")
     else
     {
         user.isAdmin=true;
         await user.save();
-        return res.status(200).send("User is now Admin")
+        return ("User is now Admin")
     }
 
-});
-
-
-router.put("/removeAdmin/:_id",isLoggedIn, isAdmin,async (req,res)=>{
-    let user = await User.findOne({_id: req.params._id});
+}
+@Security("isLoggedIn")
+@Put("/removeAdmin/{_id}")
+public async removeAdmin(@Path() _id:string){
+// router.put("/removeAdmin/:_id",isLoggedIn, isAdmin,async (req,res)=>{
+    let user = await User.findOne({_id: _id});
     if(!user)
-        return res.status(404).send("No user found with this ID");
+        return ("No user found with this ID");
     
     if(user.isAdmin)
     {
         user.isAdmin=false;
         await user.save();
-        return res.status(200).send("User is now Demoted")
+        return ("User is now Demoted")
     }
     else
     {
-        return res.status(409).send("User is not an admin anyway")
+        return ("User is not an admin anyway")
     }
 
-});
-
-router.put("/subscribe",isLoggedIn,async (req,res)=>{
-    let user = await User.findOne({_id: req.user._id});
+}
+// router.put("/subscribe",isLoggedIn,async (req,res)=>{
+@Security("isLoggedIn")
+@Put("/subscribe/{_id}")
+public async subscribe(@Path() _id:string){
+    let user = await User.findOne({_id: _id});
     if(user!.isPremium)
     {
         // console.log(user)
-        return res.status(409).send("User is already premium")
+        return ("User is already premium")
     }
     else
     {
         user!.isPremium=true;
         await user!.save();
-        return res.status(200).send("User is now Premium")
+        return ("User is now Premium")
     }
-});
+}
 
-router.put("/unsubscribe",isLoggedIn,async (req,res)=>{
-    let user = await User.findOne({_id: req.user._id});  
+
+// router.put("/unsubscribe",isLoggedIn,async (req,res)=>{
+@Security("isLoggedIn")
+@Put("/unsubscribe/{_id}")
+public async unsubscribe(@Path() _id:string){
+    let user = await User.findOne({_id: _id});  
     // console.log(user);
     if(user!.isPremium)
     {
 
         user!.isPremium=false;
         await user!.save();
-        return res.status(409).send("User now unsubscribed")
+        return ("User now unsubscribed")
     }
     else
     {
-        return res.status(200).send("User is not a premium to unsubscribe")
+        return ("User is not a premium to unsubscribe")
     }
-});
-export default router;
+}
+}

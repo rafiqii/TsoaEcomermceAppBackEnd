@@ -5,15 +5,20 @@ import path from "path";
 
 //Importing routes
 import loginRoute from "./login/loging in"
-import userRoute from "./Routes/user"
-import productRoute from "./Routes/product"
-import brandRoute from "./Routes/brand"
-import categoryRoute from "./Routes/category"
-import orderRoute from "./Routes/order"
-import cartRoute from "./Routes/cart"
+import "./Routes/user"
+import "./Routes/product"
+import "./Routes/brand"
+import "./Routes/category"
+import "./Routes/order"
+import "./Routes/cart"
+import swaggerUi from "swagger-ui-express"
+import "./authentication";
+
+
+import { RegisterRoutes } from './routes';
 
 // Creating express var
-const app=express();
+const app:express.Application=express();
 
 //extra settings
 app.use(express.urlencoded({extended: true}));
@@ -32,14 +37,20 @@ mongoose.connect(process.env.DbConnection!, {useNewUrlParser: true, useUnifiedTo
 //listening
 app.listen(3000);
 
+RegisterRoutes(app);
 //connecting to routes
-app.use("/user", userRoute);
+// app.use("/user", userRoute);
 app.use("/login",loginRoute);
-app.use("/product",productRoute);
-app.use("/brand",brandRoute);
-app.use("/category",categoryRoute);
-app.use("/order",orderRoute);
-app.use("/cart",cartRoute);
+// app.use("/product",productRoute);
+// // app.use("/brand",brandRoute);
+// app.use("/category",categoryRoute);
+// app.use("/order",orderRoute);
+// app.use("/cart",cartRoute);
 
-
+try{
+    const swagger= require("../swagger.json")
+    app.use("/docs", swaggerUi.serve, swaggerUi.setup(swagger))
+} catch(err){
+    console.log(`error in swagger file ${err}`)
+}
 

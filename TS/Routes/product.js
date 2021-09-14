@@ -1,208 +1,169 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var product_1 = require("../Models/product");
-var express_1 = __importDefault(require("express"));
-var logedInAuth_1 = require("../MiddleWare/logedInAuth");
-var isAdminAuth_1 = require("../MiddleWare/isAdminAuth");
-var isPremium_1 = require("../Functions/isPremium");
-var brandAdding_1 = require("../Functions/brandAdding");
-var categoryAdding_1 = require("../Functions/categoryAdding");
-var router = express_1.default.Router();
-router.get('/', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, _b, products;
-    return __generator(this, function (_c) {
-        switch (_c.label) {
-            case 0:
-                if (!isPremium_1.isPremiumFunction(req)) return [3 /*break*/, 2];
-                // console.log('user is premium')
-                _b = (_a = res).send;
-                return [4 /*yield*/, product_1.Product.find().populate("categories brandName")];
-            case 1:
-                // console.log('user is premium')
-                _b.apply(_a, [_c.sent()]);
-                return [3 /*break*/, 4];
-            case 2: return [4 /*yield*/, product_1.Product.find({ isPremium: false }).populate("categories brandName")];
-            case 3:
-                products = _c.sent();
-                res.send(products);
-                _c.label = 4;
-            case 4: return [2 /*return*/];
+exports.productsRoute = void 0;
+const product_1 = require("../Models/product");
+const isPremium_1 = require("../Functions/isPremium");
+const brandAdding_1 = require("../Functions/brandAdding");
+const categoryAdding_1 = require("../Functions/categoryAdding");
+const runtime_1 = require("@tsoa/runtime");
+let productsRoute = class productsRoute extends runtime_1.Controller {
+    async getProducts(req) {
+        if (isPremium_1.isPremiumFunction(req)) {
+            return (await product_1.Product.find().populate("categories brandName"));
         }
-    });
-}); });
-router.post('/', logedInAuth_1.isLoggedIn, isAdminAuth_1.isAdmin, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var product, _a, _b;
-    return __generator(this, function (_c) {
-        switch (_c.label) {
-            case 0:
-                product = new product_1.Product();
-                // console.log(req.body);
-                product.price = req.body.price;
-                // console.log(product)
-                product.name.ar = req.body.arabicName;
-                product.name.en = req.body.englishName;
-                product.icon = req.body.icon;
-                product.isPremium = req.body.isPremium;
-                product.stock = req.body.stock;
-                //if brand avalible add its refference, if not create a new object
-                _a = product;
-                return [4 /*yield*/, brandAdding_1.findBrand(product, req.body.brandName)];
-            case 1:
-                //if brand avalible add its refference, if not create a new object
-                _a.brandName = _c.sent();
-                //bug here FIXED
-                //if categories avalible add its refference, if not create new objects
-                _b = product;
-                return [4 /*yield*/, categoryAdding_1.findCat(product, req.body.categories)];
-            case 2:
-                //bug here FIXED
-                //if categories avalible add its refference, if not create new objects
-                _b.categories = _c.sent();
-                return [4 /*yield*/, product.save()];
-            case 3:
-                _c.sent();
-                res.send("item added");
-                return [2 /*return*/];
+        else {
+            const products = await product_1.Product.find({ isPremium: false }).populate("categories brandName");
+            return (products);
         }
-    });
-}); });
-router.put('/:_id', logedInAuth_1.isLoggedIn, isAdminAuth_1.isAdmin, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var product, _a, e_1;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
-            case 0: return [4 /*yield*/, product_1.Product.findOne({ _id: req.params._id })];
-            case 1:
-                product = _b.sent();
-                if (!product)
-                    return [2 /*return*/, res.status(404).send("The product that you are trying to update is not avalible, create a new product in the product menu")];
-                _b.label = 2;
-            case 2:
-                _b.trys.push([2, 6, , 7]);
-                if (req.body.arabicName)
-                    product.name[0].ar = req.body.arabicName;
-                if (req.body.englishName)
-                    product.name[0].en = req.body.englishName;
-                if (req.body.price)
-                    product.price = req.body.price;
-                if (req.body.icon)
-                    product.icon = req.body.icon;
-                if (req.body.stock)
-                    product.stock = req.body.stock;
-                if (!(req.body.isPremium == null)) //that is for a premuim item
-                    product.isPremium = req.body.isPremium;
-                if (!req.body.categories) return [3 /*break*/, 4];
-                _a = product;
-                return [4 /*yield*/, categoryAdding_1.findCat(product, req.body.categories)];
-            case 3:
-                _a.categories = _b.sent();
-                _b.label = 4;
-            case 4: return [4 /*yield*/, product.save()];
-            case 5:
-                _b.sent();
-                return [3 /*break*/, 7];
-            case 6:
-                e_1 = _b.sent();
-                console.log("Error: \n" + e_1);
-                return [3 /*break*/, 7];
-            case 7: return [2 /*return*/];
+    }
+    // router.get('/',async (req, res) => {
+    // });
+    async addAProduct(price, arabicName, englishName, icon, brandName, categories, isPremium, stock) {
+        const product = new product_1.Product();
+        // console.log(req.body);
+        product.price = price;
+        // console.log(product)
+        product.name.ar = arabicName;
+        product.name.en = englishName;
+        product.icon = icon;
+        product.isPremium = isPremium;
+        product.stock = stock;
+        //if brand avalible add its refference, if not create a new object
+        product.brandName = await brandAdding_1.findBrand(product, brandName);
+        //bug here FIXED
+        //if categories avalible add its refference, if not create new objects
+        product.categories = await categoryAdding_1.findCat(product, categories);
+        await product.save();
+        return product;
+    }
+    // router.post('/',isLoggedIn,isAdmin , async (req,res)=>{
+    // });
+    async updateProduct(_id, price, arabicName, englishName, icon, 
+    // @BPropody() brandName:string,
+    categories, isPremium, stock) {
+        const product = await product_1.Product.findOne({ _id: _id });
+        if (!product)
+            throw new Error("The product that you are trying to update is not avalible, create a new product in the product menu");
+        try {
+            if (arabicName)
+                product.name[0].ar = arabicName;
+            if (englishName)
+                product.name[0].en = englishName;
+            if (price)
+                product.price = price;
+            if (icon)
+                product.icon = icon;
+            if (stock)
+                product.stock = stock;
+            if (!(isPremium == null)) //that is for a premuim item
+                product.isPremium = isPremium;
+            if (categories) {
+                product.categories = await categoryAdding_1.findCat(product, categories);
+            }
+            await product.save();
         }
-    });
-}); });
-router.delete("/deleteCategory/:_id", logedInAuth_1.isLoggedIn, isAdminAuth_1.isAdmin, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var product, i;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, product_1.Product.findById(req.params._id).populate("category")];
-            case 1:
-                product = _a.sent();
-                if (!product)
-                    return [2 /*return*/, res.status(404).send("product not found")];
-                if (!(req.body.categoryName))
-                    return [2 /*return*/, res.status(400).send("enter a category name")];
-                for (i = 0; i < product.categories.length; i++) {
-                    if (product.categories[i].categoryName == req.body.categoryName) {
-                        product.categories.splice(i, 1);
-                        return [2 /*return*/, res.send("category removed from the product")];
-                    }
-                }
-                res.send("Category not found");
-                return [2 /*return*/];
+        catch (e) {
+            console.log(`Error: \n${e}`);
         }
-    });
-}); });
-router.put("/restock/:_id", logedInAuth_1.isLoggedIn, isAdminAuth_1.isAdmin, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var product, stock;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, product_1.Product.findById(req.params._id)];
-            case 1:
-                product = _a.sent();
-                if (!product)
-                    return [2 /*return*/, res.status(404).send("product not found")];
-                stock = 0;
-                try {
-                    stock = parseInt(req.body.stock);
-                }
-                catch (e) {
-                    return [2 /*return*/, res.send("This is not a number")];
-                }
-                // console.log(typeof stock)
-                if (stock == null || stock < 0)
-                    return [2 /*return*/, res.send("please enter a positive number for stocks")];
-                product.stock += stock;
-                res.send("product has been restocked");
-                product.save();
-                return [2 /*return*/];
+        return product;
+    }
+    // router.put('/:_id',isLoggedIn,isAdmin , async (req,res)=>{
+    // });
+    async deleteItem(categoryName, _id) {
+        const product = await product_1.Product.findById(_id).populate("category");
+        if (!product)
+            throw new Error("product not found");
+        if (!(categoryName))
+            throw new Error("enter a category name");
+        for (let i = 0; i < product.categories.length; i++) {
+            if (product.categories[i].categoryName == categoryName) {
+                product.categories.splice(i, 1);
+                return product;
+            }
         }
-    });
-}); });
-router.delete("/deleteProduct/:_id", logedInAuth_1.isLoggedIn, isAdminAuth_1.isAdmin, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, product_1.Product.findByIdAndDelete(req.params._id)];
-            case 1:
-                _a.sent();
-                return [2 /*return*/];
+        throw new Error("Category not found");
+    }
+    // router.delete("/deleteCategory/:_id", isLoggedIn, isAdmin, async (req,res)=>{
+    // });
+    async reStockProduct(_id, inputStock) {
+        let product = await product_1.Product.findById(_id);
+        if (!product)
+            throw new Error("product not found");
+        let stock = 0;
+        try {
+            stock = inputStock;
         }
-    });
-}); });
-exports.default = router;
+        catch (e) {
+            throw new Error("This is not a number");
+        }
+        // console.log(typeof stock)
+        if (stock == null || stock < 0)
+            throw new Error("please enter a positive number for stocks");
+        product.stock += stock;
+        product.save();
+        return product;
+    }
+    // router.put("/restock/:_id", isLoggedIn, isAdmin, async (req,res)=>{
+    // });
+    async deleteProduct(_id) {
+        await product_1.Product.findByIdAndDelete(_id);
+    }
+};
+__decorate([
+    runtime_1.Get(),
+    __param(0, runtime_1.Request())
+], productsRoute.prototype, "getProducts", null);
+__decorate([
+    runtime_1.Security("isLoggedIn"),
+    runtime_1.Post(),
+    __param(0, runtime_1.BodyProp()),
+    __param(1, runtime_1.BodyProp()),
+    __param(2, runtime_1.BodyProp()),
+    __param(3, runtime_1.BodyProp()),
+    __param(4, runtime_1.BodyProp()),
+    __param(5, runtime_1.BodyProp()),
+    __param(6, runtime_1.BodyProp()),
+    __param(7, runtime_1.BodyProp())
+], productsRoute.prototype, "addAProduct", null);
+__decorate([
+    runtime_1.Security("isLoggedIn"),
+    runtime_1.Put("{_id}"),
+    __param(0, runtime_1.Path()),
+    __param(1, runtime_1.BodyProp()),
+    __param(2, runtime_1.BodyProp()),
+    __param(3, runtime_1.BodyProp()),
+    __param(4, runtime_1.BodyProp()),
+    __param(5, runtime_1.BodyProp()),
+    __param(6, runtime_1.BodyProp()),
+    __param(7, runtime_1.BodyProp())
+], productsRoute.prototype, "updateProduct", null);
+__decorate([
+    runtime_1.Security("isLoggedIn"),
+    runtime_1.Delete("/deleteCategory/{_id}"),
+    __param(0, runtime_1.BodyProp()),
+    __param(1, runtime_1.Path())
+], productsRoute.prototype, "deleteItem", null);
+__decorate([
+    runtime_1.Security("isLoggedIn"),
+    runtime_1.Put("/restock/{_id}"),
+    __param(0, runtime_1.Path()),
+    __param(1, runtime_1.BodyProp())
+], productsRoute.prototype, "reStockProduct", null);
+__decorate([
+    runtime_1.Security("isLoggedIn"),
+    runtime_1.Delete("/deleteProduct/{_id}"),
+    __param(0, runtime_1.Path())
+], productsRoute.prototype, "deleteProduct", null);
+productsRoute = __decorate([
+    runtime_1.Route("product")
+], productsRoute);
+exports.productsRoute = productsRoute;

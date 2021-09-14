@@ -7,10 +7,10 @@ import path from "path";
 const env = dotenv.config({path: path.normalize(path.resolve(__dirname, "../environment/.env"))})
 const signature:Secret=process.env.jwtSignature as Secret;
 const userSchema = new mongoose.Schema<Iuser>({
-    userName: String,
+    userName: {type:String, index:true},
     password: String,
     isAdmin:  Boolean,
-    isPremium: Boolean,
+    isPremium: {type:Boolean, index:true},
     previousOrders: [{type: mongoose.Schema.Types.ObjectId, ref: "Order"}],
     cartID: [{type: mongoose.Schema.Types.ObjectId, ref: "Cart"}] // if it doesnt work change to string
 });

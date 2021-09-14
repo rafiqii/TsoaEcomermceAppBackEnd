@@ -4,8 +4,17 @@ import { Category } from "../Models/category";
 
 
 
-export async function findCat(product:Iproduct, categories: string[])
+export async function findCat(product:Iproduct, inputCategory: string[])
 {
+    let categories:string[]=[];
+    if(typeof(inputCategory)=="string")
+    {
+        categories.push(inputCategory)
+    }
+    else{
+        categories = [...inputCategory]
+    }
+
     for(let i=0;i<categories.length; i++){
         const myCategory =await Category.findOne({categoryName: categories[i]})
         if(!myCategory)

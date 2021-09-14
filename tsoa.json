@@ -1,0 +1,28 @@
+{
+    "entryFile": "./TS/app.ts",
+    "spec": {
+        "securityDefinitions": {
+            "api_key": {
+                "type": "isLoggedIn",
+                "name": "isLoggedIn",
+                "in": "query"
+            },
+            "tsoa_auth": {
+                "type": "oauth2",
+                "authorizationUrl": "http://swagger.io/api/oauth/dialog",
+                "flow": "implicit",
+                "scopes": {
+                    "write:pets": "modify things",
+                    "read:pets": "read things"
+                }
+            }
+        },
+        "outputDirectory": "."
+    },
+    "routes": {
+        "basePath": "/",
+        "entryFile":"./TS/app.ts",
+        "routesDir": "./TS",
+        "authenticationModule": "./TS/authentication.ts"
+    }
+}

@@ -4,7 +4,7 @@ import { NextFunction, Request, Response } from 'express';
 import path from 'path';
 // import { IGetUserAuthInfoRequest } from "../fixigTS/definitionfile"
 
-export function isLoggedIn(req:Request, res:Response, next) {
+export function isLoggedIn(req:Request, res:Response, next: NextFunction) {
     
     const token:string|undefined = req.header('x-Auth');
     if(!token){

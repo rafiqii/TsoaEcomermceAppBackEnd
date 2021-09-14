@@ -1,0 +1,1085 @@
+{
+	"basePath": "/",
+	"consumes": [
+		"application/json"
+	],
+	"definitions": {
+		"Icategory": {
+			"properties": {
+				"categoryName": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"categoryName"
+			],
+			"type": "object",
+			"additionalProperties": true
+		},
+		"Ibrand": {
+			"properties": {
+				"brandName": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"brandName"
+			],
+			"type": "object",
+			"additionalProperties": true
+		},
+		"Iproduct": {
+			"properties": {
+				"name": {
+					"properties": {
+						"ar": {
+							"type": "string"
+						},
+						"en": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"ar",
+						"en"
+					],
+					"type": "object"
+				},
+				"price": {
+					"type": "number",
+					"format": "double"
+				},
+				"icon": {
+					"type": "string"
+				},
+				"isPremium": {
+					"type": "boolean"
+				},
+				"stock": {
+					"type": "number",
+					"format": "double"
+				},
+				"categories": {
+					"items": {
+						"$ref": "#/definitions/Icategory"
+					},
+					"type": "array"
+				},
+				"brandName": {
+					"$ref": "#/definitions/Ibrand"
+				}
+			},
+			"required": [
+				"name",
+				"price",
+				"icon",
+				"isPremium",
+				"stock",
+				"categories",
+				"brandName"
+			],
+			"type": "object",
+			"additionalProperties": true
+		},
+		"cartsAndQuantity": {
+			"properties": {
+				"productID": {
+					"$ref": "#/definitions/Iproduct"
+				},
+				"quantity": {
+					"type": "number",
+					"format": "double"
+				}
+			},
+			"required": [
+				"productID",
+				"quantity"
+			],
+			"type": "object",
+			"additionalProperties": true
+		},
+		"invoice": {
+			"properties": {
+				"pricePaid": {
+					"type": "number",
+					"format": "double"
+				},
+				"products": {
+					"items": {
+						"$ref": "#/definitions/cartsAndQuantity"
+					},
+					"type": "array"
+				}
+			},
+			"required": [
+				"pricePaid",
+				"products"
+			],
+			"type": "object",
+			"additionalProperties": true
+		},
+		"Iorder": {
+			"properties": {
+				"products": {
+					"items": {
+						"$ref": "#/definitions/cartsAndQuantity"
+					},
+					"type": "array"
+				},
+				"rawPrice": {
+					"type": "number",
+					"format": "double"
+				},
+				"priceAfterDiscountAndVAT": {
+					"type": "number",
+					"format": "double"
+				},
+				"delivered": {
+					"type": "boolean"
+				},
+				"invoice": {
+					"$ref": "#/definitions/invoice"
+				}
+			},
+			"required": [
+				"products",
+				"rawPrice",
+				"priceAfterDiscountAndVAT",
+				"delivered",
+				"invoice"
+			],
+			"type": "object",
+			"additionalProperties": true
+		},
+		"Icart": {
+			"properties": {
+				"products": {
+					"items": {
+						"$ref": "#/definitions/cartsAndQuantity"
+					},
+					"type": "array"
+				}
+			},
+			"required": [
+				"products"
+			],
+			"type": "object",
+			"additionalProperties": true
+		}
+	},
+	"info": {
+		"title": "mini-project-2-ecomeernenrenren-backend",
+		"version": "1.0.0",
+		"license": {
+			"name": "ISC"
+		},
+		"contact": {}
+	},
+	"paths": {
+		"/user": {
+			"post": {
+				"operationId": "CreateAccount",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"type": "string",
+							"enum": [
+								"User name and password are too short. 4 < userName < 15 , 6 < password < 30",
+								"User name is too short. 4 < userName < 15 ",
+								"Password is too short. 6 < password < 30",
+								"User name and password are too Long. 4 < userName < 15 , 6 < password < 30",
+								"User name is too long. 4 < userName < 15",
+								"Password is too long. 6 < password < 30",
+								"User name is long password is short. 4 < userName < 15 , 6 < password < 30",
+								"User name is short and password is long. 4 < userName < 15 , 6 < password < 30",
+								"User created"
+							],
+							"x-nullable": false
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "body",
+						"name": "body",
+						"schema": {
+							"properties": {
+								"userName": {
+									"type": "string"
+								},
+								"password": {
+									"type": "string"
+								}
+							},
+							"title": "CreateAccountBody",
+							"type": "object",
+							"required": [
+								"userName",
+								"password"
+							]
+						}
+					}
+				]
+			}
+		},
+		"/user/setAsAdmin/{_id}": {
+			"put": {
+				"operationId": "SetAsAdmin",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"type": "string",
+							"enum": [
+								"No user found with this ID",
+								"User is already Admin",
+								"User is now Admin"
+							],
+							"x-nullable": false
+						}
+					}
+				},
+				"security": [
+					{
+						"isLoggedIn": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "_id",
+						"required": true,
+						"type": "string"
+					}
+				]
+			}
+		},
+		"/user/removeAdmin/{_id}": {
+			"put": {
+				"operationId": "RemoveAdmin",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"type": "string",
+							"enum": [
+								"No user found with this ID",
+								"User is now Demoted",
+								"User is not an admin anyway"
+							],
+							"x-nullable": false
+						}
+					}
+				},
+				"security": [
+					{
+						"isLoggedIn": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "_id",
+						"required": true,
+						"type": "string"
+					}
+				]
+			}
+		},
+		"/user/subscribe/{_id}": {
+			"put": {
+				"operationId": "Subscribe",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"type": "string",
+							"enum": [
+								"User is already premium",
+								"User is now Premium"
+							],
+							"x-nullable": false
+						}
+					}
+				},
+				"security": [
+					{
+						"isLoggedIn": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "_id",
+						"required": true,
+						"type": "string"
+					}
+				]
+			}
+		},
+		"/user/unsubscribe/{_id}": {
+			"put": {
+				"operationId": "Unsubscribe",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"type": "string",
+							"enum": [
+								"User now unsubscribed",
+								"User is not a premium to unsubscribe"
+							],
+							"x-nullable": false
+						}
+					}
+				},
+				"security": [
+					{
+						"isLoggedIn": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "_id",
+						"required": true,
+						"type": "string"
+					}
+				]
+			}
+		},
+		"/product": {
+			"get": {
+				"operationId": "GetProducts",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/Iproduct"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
+			},
+			"post": {
+				"operationId": "AddAProduct",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"$ref": "#/definitions/Iproduct"
+						}
+					}
+				},
+				"security": [
+					{
+						"isLoggedIn": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "body",
+						"name": "body",
+						"schema": {
+							"properties": {
+								"price": {
+									"type": "number",
+									"format": "double"
+								},
+								"arabicName": {
+									"type": "string"
+								},
+								"englishName": {
+									"type": "string"
+								},
+								"icon": {
+									"type": "string"
+								},
+								"brandName": {
+									"type": "string"
+								},
+								"categories": {
+									"items": {
+										"type": "string"
+									},
+									"type": "array"
+								},
+								"isPremium": {
+									"type": "boolean"
+								},
+								"stock": {
+									"type": "number",
+									"format": "double"
+								}
+							},
+							"title": "AddAProductBody",
+							"type": "object",
+							"required": [
+								"price",
+								"arabicName",
+								"englishName",
+								"icon",
+								"brandName",
+								"categories",
+								"isPremium",
+								"stock"
+							]
+						}
+					}
+				]
+			}
+		},
+		"/product/{_id}": {
+			"put": {
+				"operationId": "UpdateProduct",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"$ref": "#/definitions/Iproduct"
+						}
+					}
+				},
+				"security": [
+					{
+						"isLoggedIn": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "_id",
+						"required": true,
+						"type": "string"
+					},
+					{
+						"in": "body",
+						"name": "body",
+						"schema": {
+							"properties": {
+								"price": {
+									"type": "number",
+									"format": "double"
+								},
+								"arabicName": {
+									"type": "string"
+								},
+								"englishName": {
+									"type": "string"
+								},
+								"icon": {
+									"type": "string"
+								},
+								"categories": {
+									"items": {
+										"type": "string"
+									},
+									"type": "array"
+								},
+								"isPremium": {
+									"type": "boolean"
+								},
+								"stock": {
+									"type": "number",
+									"format": "double"
+								}
+							},
+							"title": "UpdateProductBody",
+							"type": "object",
+							"required": [
+								"price",
+								"arabicName",
+								"englishName",
+								"icon",
+								"categories",
+								"isPremium",
+								"stock"
+							]
+						}
+					}
+				]
+			}
+		},
+		"/product/deleteCategory/{_id}": {
+			"delete": {
+				"operationId": "DeleteItem",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"$ref": "#/definitions/Iproduct"
+						}
+					}
+				},
+				"security": [
+					{
+						"isLoggedIn": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "_id",
+						"required": true,
+						"type": "string"
+					},
+					{
+						"in": "body",
+						"name": "body",
+						"schema": {
+							"properties": {
+								"categoryName": {
+									"type": "string"
+								}
+							},
+							"title": "DeleteItemBody",
+							"type": "object",
+							"required": [
+								"categoryName"
+							]
+						}
+					}
+				]
+			}
+		},
+		"/product/restock/{_id}": {
+			"put": {
+				"operationId": "ReStockProduct",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"additionalProperties": true
+						}
+					}
+				},
+				"security": [
+					{
+						"isLoggedIn": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "_id",
+						"required": true,
+						"type": "string"
+					},
+					{
+						"in": "body",
+						"name": "body",
+						"schema": {
+							"properties": {
+								"inputStock": {
+									"type": "number",
+									"format": "double"
+								}
+							},
+							"title": "ReStockProductBody",
+							"type": "object",
+							"required": [
+								"inputStock"
+							]
+						}
+					}
+				]
+			}
+		},
+		"/product/deleteProduct/{_id}": {
+			"delete": {
+				"operationId": "DeleteProduct",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"security": [
+					{
+						"isLoggedIn": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "_id",
+						"required": true,
+						"type": "string"
+					}
+				]
+			}
+		},
+		"/brand": {
+			"post": {
+				"operationId": "AddBrand",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"$ref": "#/definitions/Ibrand"
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "body",
+						"name": "body",
+						"schema": {
+							"properties": {
+								"brandName": {
+									"type": "string"
+								}
+							},
+							"title": "AddBrandBody",
+							"type": "object",
+							"required": [
+								"brandName"
+							]
+						}
+					}
+				]
+			},
+			"get": {
+				"operationId": "GetBrands",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/Ibrand"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/brand/{_id}": {
+			"put": {
+				"operationId": "UpdateBrand",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"$ref": "#/definitions/Ibrand"
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "_id",
+						"required": true,
+						"type": "string"
+					},
+					{
+						"in": "body",
+						"name": "body",
+						"schema": {
+							"properties": {
+								"brandName": {
+									"type": "string"
+								}
+							},
+							"title": "UpdateBrandBody",
+							"type": "object",
+							"required": [
+								"brandName"
+							]
+						}
+					}
+				]
+			},
+			"delete": {
+				"operationId": "DeleteBrand",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"additionalProperties": true
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "_id",
+						"required": true,
+						"type": "string"
+					}
+				]
+			}
+		},
+		"/category": {
+			"post": {
+				"operationId": "CreateNewCategory",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"$ref": "#/definitions/Icategory"
+						}
+					}
+				},
+				"security": [
+					{
+						"isLoggedIn": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "body",
+						"name": "body",
+						"schema": {
+							"properties": {
+								"category": {
+									"type": "string"
+								}
+							},
+							"title": "CreateNewCategoryBody",
+							"type": "object",
+							"required": [
+								"category"
+							]
+						}
+					}
+				]
+			},
+			"get": {
+				"operationId": "GetAllCats",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/Icategory"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/category/{_id}": {
+			"put": {
+				"operationId": "UpdateCategory",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"$ref": "#/definitions/Icategory"
+						}
+					}
+				},
+				"security": [
+					{
+						"isLoggedIn": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "_id",
+						"required": true,
+						"format": "double",
+						"type": "number"
+					},
+					{
+						"in": "body",
+						"name": "body",
+						"schema": {
+							"properties": {
+								"categoryName": {
+									"type": "string"
+								}
+							},
+							"title": "UpdateCategoryBody",
+							"type": "object",
+							"required": [
+								"categoryName"
+							]
+						}
+					}
+				]
+			},
+			"delete": {
+				"operationId": "DeleteCategorey",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"type": "boolean"
+						}
+					}
+				},
+				"security": [
+					{
+						"isLoggedIn": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "_id",
+						"required": true,
+						"type": "string"
+					},
+					{
+						"in": "body",
+						"name": "body",
+						"schema": {
+							"properties": {
+								"categoryName": {
+									"type": "string"
+								}
+							},
+							"title": "DeleteCategoreyBody",
+							"type": "object",
+							"required": [
+								"categoryName"
+							]
+						}
+					}
+				]
+			}
+		},
+		"/order/buyItems": {
+			"post": {
+				"operationId": "BuyItems",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"$ref": "#/definitions/Iorder"
+						}
+					}
+				},
+				"security": [
+					{
+						"isLoggedIn": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/order/orderRecieved/{_id}": {
+			"put": {
+				"operationId": "RecievedOrder",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"$ref": "#/definitions/invoice"
+						}
+					}
+				},
+				"security": [
+					{
+						"isLoggedIn": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "_id",
+						"required": true,
+						"type": "string"
+					}
+				]
+			}
+		},
+		"/cart": {
+			"get": {
+				"operationId": "GetCart",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"$ref": "#/definitions/Icart"
+						}
+					}
+				},
+				"security": [
+					{
+						"isLoggedIn": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/cart/addItem/{_id}": {
+			"put": {
+				"operationId": "AddItemToCart",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"$ref": "#/definitions/Icart"
+						}
+					}
+				},
+				"security": [
+					{
+						"isLoggedIn": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "_id",
+						"required": true,
+						"type": "string"
+					},
+					{
+						"in": "body",
+						"name": "body",
+						"schema": {
+							"properties": {
+								"quantity": {
+									"type": "number",
+									"format": "double"
+								}
+							},
+							"title": "AddItemToCartBody",
+							"type": "object",
+							"required": [
+								"quantity"
+							]
+						}
+					}
+				]
+			}
+		},
+		"/cart/removeItem/{index}": {
+			"put": {
+				"operationId": "RemoveItemFromCart",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"$ref": "#/definitions/Icart"
+						}
+					}
+				},
+				"security": [
+					{
+						"isLoggedIn": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "index",
+						"required": true,
+						"format": "double",
+						"type": "number"
+					}
+				]
+			}
+		}
+	},
+	"produces": [
+		"application/json"
+	],
+	"swagger": "2.0",
+	"securityDefinitions": {
+		"api_key": {
+			"type": "isLoggedIn",
+			"name": "isLoggedIn",
+			"in": "query"
+		},
+		"tsoa_auth": {
+			"type": "oauth2",
+			"authorizationUrl": "http://swagger.io/api/oauth/dialog",
+			"flow": "implicit",
+			"scopes": {
+				"write:pets": "modify things",
+				"read:pets": "read things"
+			}
+		}
+	}
+}
